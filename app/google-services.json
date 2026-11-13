@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "969369511368",
+    "project_id": "swimmapp-af1cb",
+    "storage_bucket": "swimmapp-af1cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969369511368:android:bdc9d3fb9c581fade50cfd",
+        "android_client_info": {
+          "package_name": "com.yinya.swimmapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGND3O34T_bIDWgoanG0hZya8WOm3Z5jc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

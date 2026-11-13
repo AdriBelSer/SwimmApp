@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Swimm app</string>
+    <string name="hello_world">Hello, %1$s!</string>
+    <string name="default_web_client_id">969369511368-0h00e4qje2iu4jl0fvlc5jf7acq9436e.apps.googleusercontent.com</string>
+    <string name="btn_login_google">Login con Google</string>
+</resources>
