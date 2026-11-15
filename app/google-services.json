@@ -12,7 +12,20 @@
           "package_name": "com.yinya.swimmapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "969369511368-sv589noshfeefjbv1dji1hvma1ebk4qe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yinya.swimmapp",
+            "certificate_hash": "b6b240a5760ae43f7305b74946aa2453380c3d3a"
+          }
+        },
+        {
+          "client_id": "969369511368-0h00e4qje2iu4jl0fvlc5jf7acq9436e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCGND3O34T_bIDWgoanG0hZya8WOm3Z5jc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "969369511368-0h00e4qje2iu4jl0fvlc5jf7acq9436e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

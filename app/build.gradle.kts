@@ -48,10 +48,9 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
 
-    // Credential manager
-    implementation(libs.credentials)
-    implementation(libs.credentials.play.services.auth)
-    implementation(libs.googleid)
+    // Google Sign-In (legacy). En el Galaxy Watch 4/5  o anteriores el selector de Credential Manager crashea,
+    // así que usamos GoogleSignInClient. La 22.0.0 ya no incluye esta API: NO SUBIR DE 21.x.
+    implementation(libs.play.services.auth)
 
 
     implementation(libs.play.services.wearable)

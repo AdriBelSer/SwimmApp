@@ -1,9 +1,10 @@
 package com.yinya.swimmapp;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-public class MainActivity extends Activity {
+import androidx.activity.ComponentActivity;
+
+public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

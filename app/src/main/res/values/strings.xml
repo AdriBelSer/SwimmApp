@@ -3,4 +3,6 @@
     <string name="hello_world">Hello, %1$s!</string>
     <string name="default_web_client_id">969369511368-0h00e4qje2iu4jl0fvlc5jf7acq9436e.apps.googleusercontent.com</string>
     <string name="btn_login_google">Login con Google</string>
+    <string name="login_cancelado">Inicio de sesión cancelado</string>
+    <string name="login_error">No se pudo iniciar sesión</string>
 </resources>
