@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "969369511368-anjmbvgul9i0r29rnalp5iinj24h9b51.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yinya.swimmapp",
+            "certificate_hash": "8ec95b88e483df6bca63e295b96a1c45c1f5ce3a"
+          }
+        },
+        {
           "client_id": "969369511368-sv589noshfeefjbv1dji1hvma1ebk4qe.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
