@@ -52,6 +52,11 @@ dependencies {
     // así que usamos GoogleSignInClient. La 22.0.0 ya no incluye esta API: NO SUBIR DE 21.x.
     implementation(libs.play.services.auth)
 
+    //Shimmer skelleton
+    implementation(libs.shimmer)
+
+    //Recycler view wearable
+    implementation(libs.wear)
 
     implementation(libs.play.services.wearable)
     implementation(platform(libs.compose.bom))

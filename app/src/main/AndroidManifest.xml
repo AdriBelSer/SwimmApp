@@ -41,6 +41,12 @@
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
         </activity>
+
+        <activity
+            android:name=".SessionListActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

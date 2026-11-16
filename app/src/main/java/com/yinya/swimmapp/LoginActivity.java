@@ -3,6 +3,7 @@ package com.yinya.swimmapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -20,19 +21,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-// NOTA! En el Galaxy Watch el selector de cuentas de Credential Manager (Samsung) crashea al
-// elegir la cuenta ("No Activity found to handle null"), así que usamos el Google Sign-In
-// clásico, que tiene su propia pantalla. Está deprecado, de ahí el SuppressWarnings.
 @SuppressWarnings("deprecation")
 public class LoginActivity extends ComponentActivity {
 
     private static final String TAG = "SWIMMAPP";
-
     private FirebaseAuth mAuth;
     private GoogleSignInClient googleSignInClient;
     private Button btnLogin;
+    private com.facebook.shimmer.ShimmerFrameLayout shimmerLayout;
 
-    // Recibe el resultado de la pantalla de Google Sign-In
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 try {
@@ -55,7 +52,6 @@ public class LoginActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
 
-        // Si ya hay sesión iniciada, vamos directamente a la pantalla principal
         if (mAuth.getCurrentUser() != null) {
             goToMain();
             return;
@@ -63,25 +59,43 @@ public class LoginActivity extends ComponentActivity {
 
         setContentView(R.layout.activity_login);
 
-        // Pedimos el idToken con el client ID web, que es el que necesita Firebase
+        shimmerLayout = findViewById(R.id.shimmer_login);
+        btnLogin = findViewById(R.id.btn_login_google);
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        btnLogin = findViewById(R.id.btn_login_google);
-        btnLogin.setOnClickListener(v -> signInWithGoogle());
+        // Al pulsar el botón se lanza la ventana de Google
+        btnLogin.setOnClickListener(v -> {
+            // Ocultamos el botón y encendemos el skeleton
+            btnLogin.setVisibility(View.GONE);
+            shimmerLayout.setVisibility(View.VISIBLE);
+            shimmerLayout.startShimmer();
+
+            // Lanzamos la ventana
+            signInLauncher.launch(googleSignInClient.getSignInIntent());
+        });
+
+
+        // La app al arrancar: Intenta entrar en silencio
+        intentarLoginSilencioso();
     }
 
-    private void signInWithGoogle() {
-        btnLogin.setEnabled(false);
+    private void intentarLoginSilencioso() {
+        shimmerLayout.startShimmer();
 
-        // Si la cuenta ya autorizó la app antes, entra sin mostrar ninguna pantalla;
-        // si no, abrimos la pantalla de Google para elegir cuenta
         googleSignInClient.silentSignIn()
                 .addOnSuccessListener(this, this::authWithGoogle)
-                .addOnFailureListener(this, e -> signInLauncher.launch(googleSignInClient.getSignInIntent()));
+                .addOnFailureListener(this, e -> {
+                    // No hay sesión guardada: Ocultamos esqueleto y mostramos botón listo para pulsar
+                    shimmerLayout.stopShimmer();
+                    shimmerLayout.setVisibility(View.GONE);
+                    btnLogin.setVisibility(View.VISIBLE);
+                    btnLogin.setEnabled(true);
+                });
     }
 
     private void authWithGoogle(GoogleSignInAccount cuenta) {
@@ -91,6 +105,11 @@ public class LoginActivity extends ComponentActivity {
             showErrorMessage(R.string.login_error);
             return;
         }
+
+        // Si venimos del botón y ha tenido éxito, podemos volver a poner el skeleton mientras Firebase carga
+        btnLogin.setVisibility(View.GONE);
+        shimmerLayout.setVisibility(View.VISIBLE);
+        shimmerLayout.startShimmer();
 
         AuthCredential credencialFirebase = GoogleAuthProvider.getCredential(idToken, null);
         authWithFirebase(credencialFirebase);
@@ -105,12 +124,23 @@ public class LoginActivity extends ComponentActivity {
                     } else {
                         Log.e(TAG, "Error al iniciar sesión en Firebase", task.getException());
                         showErrorMessage(R.string.login_error);
+
+                        // Si Firebase falla, devolvemos el botón
+                        shimmerLayout.stopShimmer();
+                        shimmerLayout.setVisibility(View.GONE);
+                        btnLogin.setVisibility(View.VISIBLE);
                     }
                 });
     }
 
     private void showErrorMessage(int mensaje) {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+
+        // Paramos el skeleton y volvemos a mostrar el botón
+        shimmerLayout.stopShimmer();
+        shimmerLayout.setVisibility(View.GONE);
+
+        btnLogin.setVisibility(View.VISIBLE);
         btnLogin.setEnabled(true);
     }
 
@@ -118,5 +148,4 @@ public class LoginActivity extends ComponentActivity {
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
-
 }
