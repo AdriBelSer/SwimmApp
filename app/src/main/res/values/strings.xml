@@ -5,4 +5,7 @@
     <string name="btn_login_google">Login con Google</string>
     <string name="login_cancelado">Inicio de sesión cancelado</string>
     <string name="login_error">No se pudo iniciar sesión</string>
+    <string name="btn_not_completed_sessions">Sesiones no realizadas</string>
+    <string name="btn_completed_sessions">Sesiones realizadas</string>
+    <string name="txtSessionName">Session Name</string>
 </resources>
