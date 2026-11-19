@@ -34,20 +34,32 @@ public class SessionRepository {
 
     public interface OnSessionsLoadedListener {
         void onSuccess(List<SessionIndex> sessionIndexList);
-
         void onError(Exception e);
     }
 
     public interface OnSessionUpdatedListener {
         void onSuccess();
-
         void onError(Exception e);
     }
 
     public interface OnSessionDetailLoadedListener {
         void onSuccess(Session session);
-
         void onError(Exception e);
+    }
+
+    private int extractSessionNumber(String sessionId) {
+        if (sessionId == null) {
+            return Integer.MAX_VALUE;
+        }
+        String[] partes = sessionId.trim().split("\\D+");
+        if (partes.length >= 2) {
+            try {
+                return Integer.parseInt(partes[1]);
+            } catch (NumberFormatException e) {
+                return Integer.MAX_VALUE;
+            }
+        }
+        return Integer.MAX_VALUE;
     }
 
     private List<SessionIndex> filterSessions(boolean showCompleted) {
@@ -66,6 +78,14 @@ public class SessionRepository {
                 }
             }
         }
+
+        // Ordenamos la lista por el número extraído del ID (1, 2, 3... 10)
+        sessionList.sort((s1, s2) -> {
+            int num1 = extractSessionNumber(s1.getId());
+            int num2 = extractSessionNumber(s2.getId());
+            return Integer.compare(num1, num2);
+        });
+
         return sessionList;
     }
 
@@ -106,15 +126,12 @@ public class SessionRepository {
     }
 
     public void markSessionAsCompleted(String uid, String sessionId, OnSessionUpdatedListener listener) {
-        // 1. Preparamos el campo que queremos actualizar en el documento del usuario
         Map<String, Object> data = new HashMap<>();
         data.put("completed_sessions", FieldValue.arrayUnion(sessionId));
 
-        // 2. Guardamos con SetOptions.merge() para crear el documento si no existe, sin borrar otros campos
         db.collection("users").document(uid)
                 .set(data, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
-                    // 3. Solo cuando Firebase confirma, actualizamos nuestra caché en memoria
                     if (cachedCompletedIds != null && !cachedCompletedIds.contains(sessionId)) {
                         cachedCompletedIds.add(sessionId);
                     }
@@ -123,7 +140,6 @@ public class SessionRepository {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // 4. Si falla la red o los permisos, NO tocamos la caché y avisamos del error
                     if (listener != null) {
                         listener.onError(e);
                     }
@@ -150,6 +166,4 @@ public class SessionRepository {
                     }
                 });
     }
-
-
 }
