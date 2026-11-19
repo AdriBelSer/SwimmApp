@@ -6,6 +6,10 @@ import android.widget.Button;
 
 import androidx.activity.ComponentActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.yinya.swimmapp.repository.SessionRepository;
+
 public class MainActivity extends ComponentActivity {
 
     @Override
@@ -13,12 +17,15 @@ public class MainActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnPendientes = findViewById(R.id.btn_not_completed);
-        Button btnCompletadas = findViewById(R.id.btn_completed);
+        Button btnNotCompleted = findViewById(R.id.btn_not_completed);
+        Button btnCompleted = findViewById(R.id.btn_completed);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            SessionRepository.getInstance().getSessions(user.getUid(), false, null);
+        }
 
-        // Al pulsar, vamos a SessionListActivity pasándole el estado
-        btnPendientes.setOnClickListener(v -> openSessionList(false));
-        btnCompletadas.setOnClickListener(v -> openSessionList(true));
+        btnNotCompleted.setOnClickListener(v -> openSessionList(false));
+        btnCompleted.setOnClickListener(v -> openSessionList(true));
     }
 
     private void openSessionList(boolean completed) {

@@ -8,4 +8,5 @@
     <string name="btn_not_completed_sessions">Sesiones no realizadas</string>
     <string name="btn_completed_sessions">Sesiones realizadas</string>
     <string name="txtSessionName">Session Name</string>
+    <string name="tv_activity_session_list">Aún no has realizado ninguna sesión.</string>
 </resources>

@@ -16,12 +16,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <include layout="@layout/item_skeleton_sesion" />
+
             <include layout="@layout/item_skeleton_sesion" />
+
             <include layout="@layout/item_skeleton_sesion" />
+
+
         </LinearLayout>
 
     </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <TextView
+        android:id="@+id/tv_activity_session_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/tv_activity_session_list"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
 
     <!-- LA LISTA REAL (Oculta al principio) -->
     <androidx.wear.widget.WearableRecyclerView

@@ -1,25 +1,28 @@
 package com.yinya.swimmapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
 import androidx.wear.widget.WearableLinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseUser;
 import com.yinya.swimmapp.models.SessionIndex;
-import com.yinya.swimmapp.models.User;
+import com.yinya.swimmapp.repository.SessionRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SessionListActivity extends ComponentActivity {
 
     private com.facebook.shimmer.ShimmerFrameLayout shimmerLayout;
     private WearableRecyclerView recyclerView;
+    private TextView textView;
     private boolean showCompleted;
 
     @Override
@@ -31,60 +34,74 @@ public class SessionListActivity extends ComponentActivity {
 
         shimmerLayout = findViewById(R.id.shimmer_lista);
         recyclerView = findViewById(R.id.recycler_sesiones);
-
+        textView = findViewById(R.id.tv_activity_session_list);
         shimmerLayout.startShimmer();
         recyclerView.setLayoutManager(new WearableLinearLayoutManager(this));
         loadSessions();
-
-
     }
 
     private void loadSessions() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Log.e("SWIMMAPP", "Usuario no autenticado");
+            finish();
+            return;
+        }
 
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(userDoc -> {
-                    User user = userDoc.toObject(User.class);
-                    List<String> completedIds = new ArrayList<>();
+        String uid = currentUser.getUid();
 
-                    if (user != null && user.getCompletedSessions() != null) {
-                        completedIds = user.getCompletedSessions();
-                    }
-                    final List<String> finalListCompleted = completedIds;
+        SessionRepository.getInstance().getSessions(uid, showCompleted, new SessionRepository.OnSessionsLoadedListener() {
+            @Override
+            public void onSuccess(List<SessionIndex> sessionList) {
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                if (sessionList.isEmpty()) {
+                    textView.setVisibility(View.VISIBLE);
+                } else {
+                    SessionAdapter adapter = new SessionAdapter(sessionList, session -> {
+                        Log.d("SWIMMAPP", "Clicked session ID: " + session.getId());
+                        handleSessionClick(uid, session);
+                    });
 
-                    db.collection("system").document("session_index").get()
-                            .addOnSuccessListener(indexDoc -> {
-                                List<SessionIndex> sessionList = new ArrayList<>();
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
 
-                                java.util.Map<String, Object> mapaSesiones = indexDoc.getData();
+            @Override
+            public void onError(Exception e) {
+                Log.e("SWIMMAPP", "Error al cargar sesiones", e);
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                Toast.makeText(SessionListActivity.this, "Error al cargar las sesiones", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
-                                if (mapaSesiones != null) {
-                                    for (java.util.Map.Entry<String, Object> campo : mapaSesiones.entrySet()) {
-                                        String sessionId = campo.getKey();
-                                        String sessionName = String.valueOf(campo.getValue());
+    private void handleSessionClick(String uid, SessionIndex session) {
+        if (showCompleted) {
+            // Ya estaba realizada: abrimos el detalle directamente sin escribir en Firebase
+            openSessionDetail(session.getId());
+        } else {
+            // Es una sesión pendiente: primero la marcamos en Firebase y esperamos confirmación
+            SessionRepository.getInstance().markSessionAsCompleted(uid, session.getId(), new SessionRepository.OnSessionUpdatedListener() {
+                @Override
+                public void onSuccess() {
+                    openSessionDetail(session.getId());
+                }
 
-                                        SessionIndex item = new SessionIndex(sessionId, sessionName);
+                @Override
+                public void onError(Exception e) {
+                    Log.e("SWIMMAPP", "Error al marcar la sesión como realizada", e);
+                    Toast.makeText(SessionListActivity.this, "Error de conexión. No se pudo abrir la sesión.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 
-                                        boolean isCompleted = finalListCompleted.contains(item.getId());
-
-                                        if (showCompleted == isCompleted) {
-                                            sessionList.add(item);
-                                        }
-                                    }
-                                }
-
-                                shimmerLayout.stopShimmer();
-                                shimmerLayout.setVisibility(View.GONE);
-                                SessionAdapter adapter = new SessionAdapter(sessionList, session -> {
-                                    Log.d("SWIMMAPP", "Clicked session ID: " + session.getId());
-                                    // Aquí abriremos la pantalla de ejercicios en el siguiente paso
-                                });
-
-                                recyclerView.setAdapter(adapter);
-                                recyclerView.setVisibility(View.VISIBLE);
-
-                            });
-                });
+    private void openSessionDetail(String sessionId) {
+        Intent intent = new Intent(SessionListActivity.this, SessionDetailActivity.class);
+        intent.putExtra("SESSION_ID", sessionId);
+        startActivity(intent);
     }
 }
