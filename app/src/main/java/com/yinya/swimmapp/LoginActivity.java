@@ -71,17 +71,12 @@ public class LoginActivity extends ComponentActivity {
 
         // Al pulsar el botón se lanza la ventana de Google
         btnLogin.setOnClickListener(v -> {
-            // Ocultamos el botón y encendemos el skeleton
             btnLogin.setVisibility(View.GONE);
             shimmerLayout.setVisibility(View.VISIBLE);
             shimmerLayout.startShimmer();
-
-            // Lanzamos la ventana
             signInLauncher.launch(googleSignInClient.getSignInIntent());
         });
 
-
-        // La app al arrancar: Intenta entrar en silencio
         intentarLoginSilencioso();
     }
 
@@ -91,7 +86,6 @@ public class LoginActivity extends ComponentActivity {
         googleSignInClient.silentSignIn()
                 .addOnSuccessListener(this, this::authWithGoogle)
                 .addOnFailureListener(this, e -> {
-                    // No hay sesión guardada: Ocultamos esqueleto y mostramos botón listo para pulsar
                     shimmerLayout.stopShimmer();
                     shimmerLayout.setVisibility(View.GONE);
                     btnLogin.setVisibility(View.VISIBLE);
@@ -107,7 +101,6 @@ public class LoginActivity extends ComponentActivity {
             return;
         }
 
-        // Si venimos del botón y ha tenido éxito, podemos volver a poner el skeleton mientras Firebase carga
         btnLogin.setVisibility(View.GONE);
         shimmerLayout.setVisibility(View.VISIBLE);
         shimmerLayout.startShimmer();
@@ -126,7 +119,6 @@ public class LoginActivity extends ComponentActivity {
                         Log.e(TAG, "Error al iniciar sesión en Firebase", task.getException());
                         showErrorMessage(R.string.login_error);
 
-                        // Si Firebase falla, devolvemos el botón
                         shimmerLayout.stopShimmer();
                         shimmerLayout.setVisibility(View.GONE);
                         btnLogin.setVisibility(View.VISIBLE);
@@ -137,7 +129,6 @@ public class LoginActivity extends ComponentActivity {
     private void showErrorMessage(int mensaje) {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
 
-        // Paramos el skeleton y volvemos a mostrar el botón
         shimmerLayout.stopShimmer();
         shimmerLayout.setVisibility(View.GONE);
 

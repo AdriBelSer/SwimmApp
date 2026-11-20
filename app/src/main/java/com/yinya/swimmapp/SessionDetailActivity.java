@@ -42,8 +42,6 @@ public class SessionDetailActivity extends ComponentActivity {
         //Mantener pantalla encendida durante la sesion
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-
-        // 1. Recuperamos el ID que nos envía SessionListActivity
         sessionId = getIntent().getStringExtra("SESSION_ID");
         if (sessionId == null) {
             Log.e("SWIMMAPP", "No se recibió SESSION_ID");
@@ -52,7 +50,8 @@ public class SessionDetailActivity extends ComponentActivity {
         }
 
         loadSessionDetails();
-        // Interceptamos el botón físico inferior (Atrás) para hacer scroll hacia abajo
+
+        // Interceptar el botón físico inferior (Atrás) para hacer scroll hacia abajo
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -70,12 +69,12 @@ public class SessionDetailActivity extends ComponentActivity {
 
                 List<String> exercises = session.getExercises();
                 if (exercises != null && !exercises.isEmpty()) {
-                    // Unimos todos los ejercicios con un salto de línea entre cada uno
+                    // Unir todos los ejercicios con un salto de línea entre cada uno
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < exercises.size(); i++) {
                         sb.append(exercises.get(i));
                         if (i < exercises.size() - 1) {
-                            sb.append("\n\n"); // Doble salto para leerlo mejor en la piscina
+                            sb.append("\n\n");
                         }
                     }
                     tvDetails.setText(sb.toString());
@@ -103,7 +102,6 @@ public class SessionDetailActivity extends ComponentActivity {
 
         return true;
     }
-
 
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {

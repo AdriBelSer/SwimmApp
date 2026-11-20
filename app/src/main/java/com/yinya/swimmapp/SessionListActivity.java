@@ -80,10 +80,8 @@ public class SessionListActivity extends ComponentActivity {
 
     private void handleSessionClick(String uid, SessionIndex session) {
         if (showCompleted) {
-            // Ya estaba realizada: abrimos el detalle directamente sin escribir en Firebase
             openSessionDetail(session.getId());
         } else {
-            // Es una sesión pendiente: primero la marcamos en Firebase y esperamos confirmación
             SessionRepository.getInstance().markSessionAsCompleted(uid, session.getId(), new SessionRepository.OnSessionUpdatedListener() {
                 @Override
                 public void onSuccess() {

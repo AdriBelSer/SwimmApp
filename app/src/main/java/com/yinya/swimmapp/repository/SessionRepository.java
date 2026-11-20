@@ -79,7 +79,7 @@ public class SessionRepository {
             }
         }
 
-        // Ordenamos la lista por el número extraído del ID (1, 2, 3... 10)
+        // Ordenar la lista por el número extraído del ID (1, 2, 3... 10)
         sessionList.sort((s1, s2) -> {
             int num1 = extractSessionNumber(s1.getId());
             int num2 = extractSessionNumber(s2.getId());
